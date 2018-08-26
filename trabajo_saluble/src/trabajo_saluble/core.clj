@@ -45,7 +45,7 @@
 (defn getestado
     [model, txttemperatura , txtruido, txthumedad]
     (def codigo (svm/predict model {1 (Double/parseDouble txttemperatura), 2 (Double/parseDouble txtruido), 3 (Double/parseDouble txthumedad) })) 
-    (println codigo)
+    ;(println codigo)
     (case codigo 
          1.0 (str "Estado actual: adecuado"  )
         -1.0 (str "Estado actual: no adecuado por temperatura.")
@@ -74,7 +74,6 @@
     (defn inc-counter []
     (swap! counter inc))
 
-    (print "Realizando las pruebas...\n")
     (doseq [item datasetDePrueba]
         (if (= (str (int (svm/predict model (last item)))) (str (first item)))
             (inc-counter)))
