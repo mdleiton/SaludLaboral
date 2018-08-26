@@ -5,39 +5,84 @@
   (:import (javax.swing SwingUtilities JFrame JLabel JTextField JButton JPanel JOptionPane  JTextArea)
            (java.awt FlowLayout BorderLayout GridLayout)
            (java.awt.event ActionListener))
-  (:use (incanter core stats charts datasets))
+  (:use (incanter core stats charts datasets) org.httpkit.server)
   (:gen-class))
 
-(defn -main [& args]
+(defn app [request]
+(with-channel request channel
+    (on-close channel (fn [status] (println "channel closed: " status)))
+    (on-receive channel (fn [data] ;; echo it back
+                          (send! channel data)))))
   
-    ; Load the heart scale example dataset.
-    ;(def dataset (svm/read-dataset "data/prueba"))
+(defonce server (atom nil))
 
-    ; Train a SVM model.
-    ;(def model (svm/train-model dataset))
+(defn stop-server []
+  (when-not (nil? @server)
+    ;; graceful shutdown: wait 100ms for existing requests to be finished
+    ;; :timeout is optional, when no timeout, stop immediately
+    (@server :timeout 100)
+    (reset! server nil)))
 
-    ; Get the feature map you want to predict.
-    ;(def datasetDePrueba (svm/read-dataset "data/prueba"))
+
+
+(defn  sugerencias
+  [idCategoria]
+  (case idCategoria 
+    1 (str "sugerencia 1")
+    -1 (str "sugerencia -1")
+    -2 (str "sugerencia -2")
+    -3 (str "sugerencia -3")
+    (str "sugerencia -4"))
+  )
+
+(defn  getmensaje
+  [model, txttemperatura , txtruido, txthumedad]
+  (def codigo (svm/predict model {1 (Double/parseDouble txttemperatura), 2 (Double/parseDouble txtruido), 3 (Double/parseDouble txthumedad) })) 
+  (case codigo 
+    1.0 (str "Categoria: adecuado" "\n" (sugerencias 1) )
+    -1.0 (str "Categoria: no adecuado por temperatura." "\n" (sugerencias -1))
+    -2.0 (str "Categoria: no adecuado por Humedad." "\n" (sugerencias -2))
+    -3.0  (str "Categoria: no adecuado por ruido. " "\n" (sugerencias -3))
+    (str "Categoria: no adecuado " "\n" (sugerencias -4)))
+  )
+
+(defn  getestado
+  [model, txttemperatura , txtruido, txthumedad]
+  (def codigo (svm/predict model {1 (Double/parseDouble txttemperatura), 2 (Double/parseDouble txtruido), 3 (Double/parseDouble txthumedad) })) 
+  (println codigo)
+  (case codigo 
+    1.0 (str "Estado actual: adecuado"  )
+    -1.0 (str "Estado actual: no adecuado por temperatura.")
+    -2.0 (str "Estado actual: no adecuado por Humedad." )
+    -3.0  (str "Estado actual: no adecuado por ruido. " )
+    (str "Estado actual: no adecuado " ))
+  )
+
+
+(defn -main [& args]
+    ;(reset! server (run-server #'app {:address "192.168.0.100" :port 8080, :body "todo bajo control"}  ) )
+    (def datasetTrain (svm/read-dataset "data/prueba2"))
+
+    (def model (svm/train-model datasetTrain))
+
+    (def datasetDePrueba (svm/read-dataset "data/prueba"))
     
-    ;(def counter (atom 0))
-    ;(defn inc-counter []
-    ;(swap! counter inc))
+    (def counter (atom 0))
+    (defn inc-counter []
+    (swap! counter inc))
 
-    ; (for [x datasetDePrueba] )
+    (def feature (last (first datasetDePrueba)))
 
-    ;(def feature (last (first datasetDePrueba)))
-    ;=> {1 0.708333, 2 1.0, 3 1.0, ...}
+    (doseq [item datasetDePrueba]
+        (if (= (str (int (svm/predict model (last item)))) (str (first item)))
+            (inc-counter))
+    )
+    (def resultadoPruebas (str @counter
+        " pruebas exitosas de clasificacion de un total de " (count datasetDePrueba) ",\n"
+        "despues de haber realizado un entrenamiento con " (count datasetTrain) " datos.\n"
+    ))
 
-    ;(print (first datasetDePrueba))
-    ;(let [[x y] (first datasetDePrueba)]
-     ;   (print x))
-
-    ; Label it.
-    ; )
-    ;=> 1.0
-
-    ;Interfaz 
-
+    ;Interfaz
     (let [  f (JFrame. "Tiempo de Descanso")
           labelhumedad (JLabel. "Humedad:    ")
           labelpruebas(JLabel. "Resultados de predicción")
@@ -54,65 +99,39 @@
           f (proxy [JFrame ActionListener]
           [] ; 
   
-          (actionPerformed [e] ; nil below is the parent component
-            ;(JOptionPane/showMessageDialog
-             ;nil  (str (svm/predict model {1 (Double/parseDouble (.getText txttemperatura)), 2 (Double/parseDouble(.getText txtruido)), 3 (Double/parseDouble(.getText txthumedad)) }))                  
-              ;   )
-
-
-            (def data (inio/read-dataset "lluvia.csv" :header true))
-            ;Humedad
+          (actionPerformed [e] 
             
-
-                  (def iris (to-matrix data))
-                  ;(view iris)
-
-                  (def X (sel iris :cols (range 4)))
-                  (def species (sel iris :cols 4))
-                  (def pca (principal-components X))
-                  (def components (:rotation pca))
-                  (def pc1 (sel components :cols 0))
-                  (def pc2 (sel components :cols 1))
-                  (def x1 (mmult X pc1))
-                  (def x2 (mmult X pc2))
-
-                  (view (scatter-plot x1 x2
-                                  :group-by species
-                                  :x-label "PC1"
-                                  :y-label "PC2"
-                                  :title "Iris PCA"
-                                  :legend true) 
-                  )
-
+            (def data (inio/read-dataset "data/paraGraficar.csv" :header true))
             
+                        ;(def matrizdata (to-matrix data))
 
-
-
+                        ;(def X (sel matrizdata :cols (range 3)))
+                        ;(def categoria (sel matrizdata :cols 3))
+                        ;(def pca (principal-components X))
+                        ;(def components (:rotation pca))
+                        ;(def temperatura (sel components :cols 0))
+                        ;(def ruido (sel components :cols 2))
+                        ;(def x1 (mmult X temperatura))
+                        ;(def x2 (mmult X ruido))
+                        ;(view (scatter-plot x1 x2 :group-by categoria :x-label "Temperatura" :y-label "Ruido" :title "Datos " :legend true))
+            (view (scatter-plot :temperatura :ruido :group-by :clase :x-label "Temperatura"
+                           :y-label "Ruido" :title "Datos " :legend true :data data) )
+            
+            (doto labelestadoactual (.setText (getestado model (.getText txttemperatura) (.getText txtruido) (.getText txthumedad))))
+            (JOptionPane/showMessageDialog
+              nil  (getmensaje model (.getText txttemperatura) (.getText txtruido) (.getText txthumedad))             
+              )
+            (doto txttemperatura (.setText ""))
+            (doto txtruido (.setText ""))
+            (doto txthumedad (.setText ""))
 
             ))]
 
-          (.addActionListener
-            buttonpruebas
+          (.addActionListener buttonpruebas
             (reify ActionListener
-            (actionPerformed
-             [_ evt]
-              (let [  fa (JFrame. "Información de predicción")
-                    labelpruebas(JLabel. "Resultados de predicción")]                    
-
-                  (doto fa
-                    (.setLayout (GridLayout. 5 2 25 10))
-                    (.add labelpruebas)
-                  
-                    
-                    (.setResizable false)
-                    (.setVisible true))
-                    (.setSize fa 450 250)     
-                  fa
-              )
-
+            (actionPerformed [_ evt] (JOptionPane/showMessageDialog nil  resultadoPruebas )
              )))
 
-            
         (doto f
           (.setLayout (GridLayout. 5 2 25 10))
           (.add labelpruebas)
