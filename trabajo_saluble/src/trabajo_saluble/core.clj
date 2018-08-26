@@ -103,7 +103,7 @@
                     (.setLayout (GridLayout. 5 2 25 10))
                     (.add labelpruebas)
                   
-                    (.setDefaultCloseOperation JFrame/EXIT_ON_CLOSE)
+                    
                     (.setResizable false)
                     (.setVisible true))
                     (.setSize fa 450 250)     
