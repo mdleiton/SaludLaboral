@@ -1,44 +1,57 @@
 from random import randint
 
+MINTEMP = 21
 MAXTEMP = 29
-MAXHUME = 65
+MINHUME = 35
+MAXHUME = 55
+MINRUID = 6
 MAXRUID = 55
 NUMVECTORES = 10000
 
-datosDeEntrenamiento={'+1':[],'-1':[]}
-datosDePrueba={'+1':[],'-1':[]}
+datosDeEntrenamiento={'+1':[],'-1':[],'-2':[],'-3':[],'-4':[]}
+datosDePrueba={'+1':[],'-1':[],'-2':[],'-3':[],'-4':[]}
 
 def generaTemperatura():
-    return randint(23,40)
+    return randint(-18,70)
 def generaHumedad():
-    return randint(45,90)  
+    return randint(0,101)  
 def generaRuido():
-    return randint(20,75)
+    return randint(0,101)
 
 def determinaClase(temperatura,humedad,ruido):
-    
     tempMolesta = False
     humeMolesta = False
     ruidMolesta = False
     countMolestias = 0
 
-    if temperatura > MAXTEMP:
+    # DESCRIPCION CATEGORIAS
+    # adecuado            +1
+    # no adecuado por t   -1
+    # no adecuado po h    -2
+    # no adecuado por r   -3
+    # no adecuado         -4
+
+    if temperatura > MAXTEMP or temperatura < MINTEMP:
         tempMolesta = True
         countMolestias += 1
-    if humedad > MAXHUME:
+
+    if humedad > MAXHUME or humedad < MINHUME:
         humeMolesta = True
         countMolestias += 1
-    if ruido > MAXRUID:
+
+    if ruido > MAXRUID or ruido < MINRUID:
         ruidMolesta = True
         countMolestias += 1
 
-    if countMolestias == 3:
-        return "-1"
-    elif countMolestias == 2:
-        if tempMolesta and humeMolesta:
-            return "-1"
+    if countMolestias == 3 or countMolestias == 2:
+        return "-4"
+    elif countMolestias == 1:
+        if ruidMolesta:
+            return "-3"
+        elif humeMolesta:
+            return "-2"
         else:
-            return "+1"
+            return "-1"
     else:
         return "+1"
 
@@ -98,10 +111,40 @@ def noEstaRepetido(diccionario,vectorCaracteristicas,clase):
 #------------------------------------------------------------
 #--              PARA ESCRIBIR EN LOS ARCHIVOS             --
 #------------------------------------------------------------
+
+# Para que el algoritmo entrene
 fileEntrenamiento = open("entrenamiento","a")
 fileEntrenamiento.truncate(0)
 filePrueba = open("prueba","a")
 filePrueba.truncate(0)
+
+# Para graficarlos
+# fileAdecuado = open("adecuado.csv","a")
+# fileAdecuado.truncate(0)
+# fileNoAdecuadoPorTemp = open("noAdecuadoPorTemp","a")
+# fileNoAdecuadoPorTemp.truncate(0)
+# fileNoAdecuadoPorHume = open("noAdecuadoPorHume","a")
+# fileNoAdecuadoPorHume.truncate(0)
+# fileNoAdecuadoPorRuid = open("noAdecuadoPorRuid","a")
+# fileNoAdecuadoPorRuid.truncate(0)
+# fileNoAdecuado = open("noAdecuado.csv","a")
+# fileNoAdecuado.truncate(0)
+
+# header= "temperatura,humedad,ruido"
+# fileAdecuado.write(header+"\n")
+# fileNoAdecuadoPorTemp.write(header+"\n")
+# fileNoAdecuadoPorHume.write(header+"\n")
+# fileNoAdecuadoPorRuid.write(header+"\n")
+# fileNoAdecuado.write(header+"\n")
+
+# diccionarioCSV = {'+1':fileAdecuado,'-1':fileNoAdecuadoPorTemp,'-2':fileNoAdecuadoPorHume,'-3':fileNoAdecuadoPorRuid,'-4':fileNoAdecuado}
+
+
+# Para graficar 
+fileParaGraficar = open("paraGraficar.csv","a")
+fileParaGraficar.truncate(0)
+header= "temperatura,humedad,ruido,clase"
+fileParaGraficar.write(header+"\n")
 
 countVectores = 0
 while countVectores<NUMVECTORES:
@@ -110,21 +153,33 @@ while countVectores<NUMVECTORES:
     clase = datos[1]
     #busca en datosDeEntrenamiento
     if noEstaRepetido(diccionario=datosDeEntrenamiento,vectorCaracteristicas=vectorCaracteristicas,clase=clase):
-        #el 80% debe de ser de entrenamienti, el otro de prueba
+        #el 80% debe de ser de entrenamiento, el otro de prueba
         #busca en datosDePrueba despues de verificar que no esta en datosDeEntrenamiento
         if countVectores >= int(NUMVECTORES * 0.8)-1:
             if noEstaRepetido(diccionario=datosDePrueba,vectorCaracteristicas=vectorCaracteristicas,clase=clase):
                 datosDePrueba[clase].append(vectorCaracteristicas)
-                newline = clase +" 1:"+ str(vectorCaracteristicas[0]) +" 2:"+ str(vectorCaracteristicas[1]) +" 3:"+ str(vectorCaracteristicas[2])
-                # print("Prueba        | " + newline )
-                filePrueba.write(newline+"\n")
+                newlineRN = clase +" 1:"+ str(vectorCaracteristicas[0]) +" 2:"+ str(vectorCaracteristicas[1]) +" 3:"+ str(vectorCaracteristicas[2])
+                # print("Prueba        | " + newlineRN )
+                filePrueba.write(newlineRN+"\n")
+                # diccionarioCSV[clase].write(str(vectorCaracteristicas[0])+","+str(vectorCaracteristicas[1])+","+str(vectorCaracteristicas[2])+"\n")
+                fileParaGraficar.write(str(vectorCaracteristicas[0])+","+str(vectorCaracteristicas[1])+","+str(vectorCaracteristicas[2])+","+clase+"\n")
                 countVectores +=1
         else:
             datosDeEntrenamiento[clase].append(vectorCaracteristicas)
-            newline = clase +" 1:"+ str(vectorCaracteristicas[0]) +" 2:"+ str(vectorCaracteristicas[1]) +" 3:"+ str(vectorCaracteristicas[2])
-            # print("Entrenamiento | " + newline )
-            fileEntrenamiento.write(newline+"\n")
+            newlineRN = clase +" 1:"+ str(vectorCaracteristicas[0]) +" 2:"+ str(vectorCaracteristicas[1]) +" 3:"+ str(vectorCaracteristicas[2])
+            # print("Entrenamiento | " + newlineRN )
+            fileEntrenamiento.write(newlineRN+"\n")
+            # diccionarioCSV[clase].write(str(vectorCaracteristicas[0])+","+str(vectorCaracteristicas[1])+","+str(vectorCaracteristicas[2])+"\n")
+            fileParaGraficar.write(str(vectorCaracteristicas[0])+","+str(vectorCaracteristicas[1])+","+str(vectorCaracteristicas[2])+","+clase+"\n")
             countVectores +=1
 
 fileEntrenamiento.close()
 filePrueba.close()
+
+# fileAdecuado.close()
+# fileNoAdecuadoPorTemp.close()
+# fileNoAdecuadoPorHume.close()
+# fileNoAdecuadoPorRuid.close()
+# fileNoAdecuado.close()
+
+fileParaGraficar.close()
