@@ -3,7 +3,7 @@ from random import randint
 MAXTEMP = 29
 MAXHUME = 65
 MAXRUID = 55
-NUMVECTORES = 5000
+NUMVECTORES = 10000
 
 datosDeEntrenamiento={'+1':[],'-1':[]}
 datosDePrueba={'+1':[],'-1':[]}
