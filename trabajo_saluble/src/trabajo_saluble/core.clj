@@ -1,72 +1,36 @@
 (ns trabajo-saluble.core
-  (:require [svm.core :as svm] [clojure.core.matrix :as mtx]
+  (:require [trabajo-saluble.sugerencias :as sugerencias]
+            [svm.core :as svm] [clojure.core.matrix :as mtx]
             [incanter.io :as inio] [incanter.charts :as incharts]
-            [incanter.stats :as instats] [incanter.datasets :as indatasets] [incanter.core :as incore])
+            [incanter.stats :as instats] [incanter.datasets :as indatasets] [incanter.core :as incore]
+            [clojure.data.json :as json])
   (:import (javax.swing SwingUtilities JFrame JLabel JTextField JButton JPanel JOptionPane  JTextArea)
            (java.awt FlowLayout BorderLayout GridLayout)
            (java.awt.event ActionListener))
   (:use (incanter core stats charts datasets) org.httpkit.server)
   (:gen-class))
 
+; mensaje de respuesta del server. se actualiza.
+(def es (str "Estado actual: Sin adecuado " ))
+
+; servidor que recibe las consultas de la app movil.
 (defn app [request]
-(with-channel request channel
-    (on-close channel (fn [status] (println "channel closed: " status)))
-    (on-receive channel (fn [data] ;; echo it back
-                          (send! channel data)))))
+ {:status  200
+   :headers {"Content-Type" "text/html"}
+   :body    (str es) })
   
 (defonce server (atom nil))
 
-(defn stop-server []
-  (when-not (nil? @server)
-    ;; graceful shutdown: wait 100ms for existing requests to be finished
-    ;; :timeout is optional, when no timeout, stop immediately
-    (@server :timeout 100)
-    (reset! server nil)))
-
-
-
-(defn  sugerencias
-  [idCategoria]
-  (case idCategoria 
-    1 (str "sugerencia 1")
-    -1 (str "sugerencia -1")
-    -2 (str "sugerencia -2")
-    -3 (str "sugerencia -3")
-    (str "sugerencia -4"))
-  )
-
-(defn  getmensaje
-  [model, txttemperatura , txtruido, txthumedad]
-  (def codigo (svm/predict model {1 (Double/parseDouble txttemperatura), 2 (Double/parseDouble txtruido), 3 (Double/parseDouble txthumedad) })) 
-  (case codigo 
-    1.0 (str "Categoria: adecuado" "\n" (sugerencias 1) )
-    -1.0 (str "Categoria: no adecuado por temperatura." "\n" (sugerencias -1))
-    -2.0 (str "Categoria: no adecuado por Humedad." "\n" (sugerencias -2))
-    -3.0  (str "Categoria: no adecuado por ruido. " "\n" (sugerencias -3))
-    (str "Categoria: no adecuado " "\n" (sugerencias -4)))
-  )
-
-(defn  getestado
-  [model, txttemperatura , txtruido, txthumedad]
-  (def codigo (svm/predict model {1 (Double/parseDouble txttemperatura), 2 (Double/parseDouble txtruido), 3 (Double/parseDouble txthumedad) })) 
-  (println codigo)
-  (case codigo 
-    1.0 (str "Estado actual: adecuado"  )
-    -1.0 (str "Estado actual: no adecuado por temperatura.")
-    -2.0 (str "Estado actual: no adecuado por Humedad." )
-    -3.0  (str "Estado actual: no adecuado por ruido. " )
-    (str "Estado actual: no adecuado " ))
-  )
-
-
 (defn -main [& args]
-    ;(reset! server (run-server #'app {:address "192.168.0.100" :port 8080, :body "todo bajo control"}  ) )
-    (def datasetTrain (svm/read-dataset "data/prueba2"))
-
-    (def model (svm/train-model datasetTrain))
-
-    (def datasetDePrueba (svm/read-dataset "data/prueba"))
+    ;; iniciando servidor que recibe las consultas de la app movil.
+    (reset! server (run-server #'app {:address "192.168.0.100" :port 8080}  ) )
     
+    ;; generación del modelo de predicción
+    (def datasetTrain (svm/read-dataset "data/prueba2"))
+    (def model (svm/train-model datasetTrain))
+    (def datasetDePrueba (svm/read-dataset "data/prueba"))
+
+    ;;pruebas de funcionalidad del modelos.
     (def counter (atom 0))
     (defn inc-counter []
     (swap! counter inc))
@@ -75,12 +39,11 @@
 
     (doseq [item datasetDePrueba]
         (if (= (str (int (svm/predict model (last item)))) (str (first item)))
-            (inc-counter))
-    )
+            (inc-counter)))
+
     (def resultadoPruebas (str @counter
         " pruebas exitosas de clasificacion de un total de " (count datasetDePrueba) ",\n"
-        "despues de haber realizado un entrenamiento con " (count datasetTrain) " datos.\n"
-    ))
+        "despues de haber realizado un entrenamiento con " (count datasetTrain) " datos.\n"))
 
     ;Interfaz
     (let [  f (JFrame. "Tiempo de Descanso")
@@ -95,38 +58,33 @@
           buttonverificacion (JButton. "Verificar condiciones" )    
           labelestadoactual(JLabel. "Estado actual:")
           
-
           f (proxy [JFrame ActionListener]
           [] ; 
   
           (actionPerformed [e] 
-            
-            (def data (inio/read-dataset "data/paraGraficar.csv" :header true))
-            
-                        ;(def matrizdata (to-matrix data))
-
-                        ;(def X (sel matrizdata :cols (range 3)))
-                        ;(def categoria (sel matrizdata :cols 3))
-                        ;(def pca (principal-components X))
-                        ;(def components (:rotation pca))
-                        ;(def temperatura (sel components :cols 0))
-                        ;(def ruido (sel components :cols 2))
-                        ;(def x1 (mmult X temperatura))
-                        ;(def x2 (mmult X ruido))
-                        ;(view (scatter-plot x1 x2 :group-by categoria :x-label "Temperatura" :y-label "Ruido" :title "Datos " :legend true))
-            (view (scatter-plot :temperatura :ruido :group-by :clase :x-label "Temperatura"
-                           :y-label "Ruido" :title "Datos " :legend true :data data) )
-            
-            (doto labelestadoactual (.setText (getestado model (.getText txttemperatura) (.getText txtruido) (.getText txthumedad))))
-            (JOptionPane/showMessageDialog
-              nil  (getmensaje model (.getText txttemperatura) (.getText txtruido) (.getText txthumedad))             
-              )
-            (doto txttemperatura (.setText ""))
-            (doto txtruido (.setText ""))
-            (doto txthumedad (.setText ""))
-
+            ;; validar input 
+            (try
+                ;; actualizar datos del servidor
+              (def es (sugerencias/getmensaje model (.getText txttemperatura) (.getText txtruido) (.getText txthumedad)))
+               ;; graficar datos  
+              (def data (inio/read-dataset "data/paraGraficar.csv" :header true))
+              (view (scatter-plot :temperatura :ruido :group-by :clase :x-label "Temperatura"
+                             :y-label "Ruido" :title "Datos " :legend true :data data) )          
+              ;; actualizar estado en la ventana principal (a lado del boton de verificacion)
+              (doto labelestadoactual (.setText (sugerencias/getestado model (.getText txttemperatura) (.getText txtruido) (.getText txthumedad))))
+              
+              ;; presentacion de la predicción
+              (JOptionPane/showMessageDialog nil  (sugerencias/getmensaje model (.getText txttemperatura) (.getText txtruido) (.getText txthumedad)))
+              ;; limpiezando valores de los inputs
+              (doto txttemperatura (.setText ""))
+              (doto txtruido (.setText ""))
+              (doto txthumedad (.setText ""))
+            (catch Exception e 
+              (JOptionPane/showMessageDialog nil  (str "ingrese valores válidos" ))
+              ))
             ))]
 
+          ;; funcion para presentar informacion de las pruebas boton (ver pruebas)
           (.addActionListener buttonpruebas
             (reify ActionListener
             (actionPerformed [_ evt] (JOptionPane/showMessageDialog nil  resultadoPruebas )
