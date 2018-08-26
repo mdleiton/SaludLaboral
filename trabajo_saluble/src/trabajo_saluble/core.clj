@@ -31,11 +31,10 @@
     (def datasetDePrueba (svm/read-dataset "data/prueba"))
 
     ;;pruebas de funcionalidad del modelos.
+    ; CONTADOR se lo llama con (inc-counter)
     (def counter (atom 0))
     (defn inc-counter []
     (swap! counter inc))
-
-    (def feature (last (first datasetDePrueba)))
 
     (doseq [item datasetDePrueba]
         (if (= (str (int (svm/predict model (last item)))) (str (first item)))
@@ -87,30 +86,29 @@
           ;; funcion para presentar informacion de las pruebas boton (ver pruebas)
           (.addActionListener buttonpruebas
             (reify ActionListener
-            (actionPerformed [_ evt] (JOptionPane/showMessageDialog nil  resultadoPruebas )
-             )))
+              (actionPerformed [_ evt] (JOptionPane/showMessageDialog nil resultadoPruebas ))))
 
         (doto f
-          (.setLayout (GridLayout. 5 2 25 10))
-          (.add labelpruebas)
-          (.add buttonpruebas)
-          (.add labeltemperatura)
-          (.add txttemperatura)  
-          (.add labelruido)
-          (.add txtruido)
-          (.add labelhumedad)
-          (.add txthumedad)
-          (.add buttonverificacion)
-          (.add labelestadoactual)
+            (.setLayout (GridLayout. 5 2 25 10))
+            (.add labelpruebas)
+            (.add buttonpruebas)
+            (.add labeltemperatura)
+            (.add txttemperatura)  
+            (.add labelhumedad)
+            (.add txthumedad)
+            (.add labelruido)
+            (.add txtruido)
+            (.add buttonverificacion)
+            (.add labelestadoactual)
+            
+            (.setDefaultCloseOperation JFrame/EXIT_ON_CLOSE)
+            (.setResizable false)
+            (.setVisible true))
         
-          (.setDefaultCloseOperation JFrame/EXIT_ON_CLOSE)
-          (.setResizable false)
-          (.setVisible true))
-          (.setTitle f "sistema de predicción")
-          (.setSize f 450 250)
-          (.addActionListener buttonverificacion f)
-       
-        f 
-    )
-   
+        (.setTitle f "sistema de predicción")
+        (.setSize f 450 250)
+        (.addActionListener buttonverificacion f)
+            
+        f
+    )   
 )
