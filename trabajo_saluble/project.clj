@@ -9,7 +9,7 @@
   :target-path "target/%s"
   :plugins [[lein-git-deps "0.0.1-SNAPSHOT"]]
   :git-dependencies [
-  					["https://github.com/tobyhede/monger.git"]
-  					["https://github.com/r0man/svm-clj.git"
-                       "1d0f89ba11eb699e5b4aecf2eade0bfd44f3f523"]]
+  					           ["https://github.com/tobyhede/monger.git"]
+  					           ["https://github.com/r0man/svm-clj.git"
+                                                    "1d0f89ba11eb699e5b4aecf2eade0bfd44f3f523"]]
   :profiles {:uberjar {:aot :all}})
