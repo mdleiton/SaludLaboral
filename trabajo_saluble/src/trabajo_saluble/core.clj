@@ -8,30 +8,39 @@
   (:gen-class))
 
 (defn -main [& args]
-  
-    (def dataset (svm/read-dataset "data/entrenamiento"))
-
-    (def model (svm/train-model dataset))
-
-    (def datasetDePrueba (svm/read-dataset "data/prueba"))
     
+    (print "Cargando archivo para entrenamiento...\n")
+    (def dataset (svm/read-dataset "data/entrenamiento"))
+    (print "Carga del archivo finalizada!\n")
+
+    (print "Entrenando...\n")
+    (def model (svm/train-model dataset))
+    (print "Entrenamiento finalizado!\n")
+
+    (print "Cargando archivo para pruebas...\n")
+    (def datasetDePrueba (svm/read-dataset "data/prueba"))
+    (print "Carga del archivo para pruebas finalizada!\n")
+
     ; CONTADOR se lo llama con (inc-counter)
     (def counter (atom 0))
     (defn inc-counter []
     (swap! counter inc))
 
-    (def feature (last (first datasetDePrueba)))
+    ;(def feature (last (first datasetDePrueba)))
 
+    (print "Realizando las pruebas...\n")
     (doseq [item datasetDePrueba]
         (if (= (str (int (svm/predict model (last item)))) (str (first item)))
             (inc-counter))
     )
+    (print "pruebas finalizadas!\n\n")
 
     (print (str
+        "Resultados:\n "
         @counter
         " pruebas exitosas de clasificacion de un total de "
         (count datasetDePrueba)
-        ",\n"
+        ",\n "
         "despues de haber realizado un entrenamiento con "
         (count dataset)
         " datos.\n"
@@ -56,17 +65,17 @@
   
           (actionPerformed [e] ; nil below is the parent component
             (JOptionPane/showMessageDialog
-             nil  (str (svm/predict model {1 (Double/parseDouble (.getText txttemperatura)), 2 (Double/parseDouble(.getText txtruido)), 3 (Double/parseDouble(.getText txthumedad)) }))                  
+             nil  (str (svm/predict model {1 (Double/parseDouble (.getText txttemperatura)), 2 (Double/parseDouble(.getText txthumedad)), 3 (Double/parseDouble(.getText txtruido)) }))                  
                  )))]
 
         (doto f
           (.setLayout (GridLayout. 4 2 25 6))
           (.add labeltemperatura)
           (.add txttemperatura)  
-          (.add labelruido)
-          (.add txtruido)
           (.add labelhumedad)
           (.add txthumedad)
+          (.add labelruido)
+          (.add txtruido)
           (.add buttonverificacion)
           (.add labelestadoactual)
           
