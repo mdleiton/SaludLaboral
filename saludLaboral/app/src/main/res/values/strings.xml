@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">saludLaboral</string>
+    <string name="hello_world"></string>
+    <string name="textview">TextView</string>
+    <string name="bienvenida">Bienvenidos al sistema de avisos de la empresa</string>
+    <string name="menu">Lista de categorias:</string>
+
+</resources>
