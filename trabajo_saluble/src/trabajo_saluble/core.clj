@@ -11,8 +11,8 @@
   (:gen-class))
 
 ; mensaje de respuesta del server. se actualiza.
-(def es (str "Estado actual: Sin adecuado " ))
-
+(def es (str "1-Estado actual: Sin estado." ))
+(def idmjs (int 2 ))
 ; servidor que recibe las consultas de la app movil.
 (defn app [request]
  {:status  200
@@ -64,7 +64,8 @@
             ;; validar input 
             (try
                 ;; actualizar datos del servidor
-              (def es (sugerencias/getmensaje model (.getText txttemperatura) (.getText txtruido) (.getText txthumedad)))
+               (def idmjs (+ idmjs 1))
+              (def es (str (str idmjs) "-" (sugerencias/getmensaje model (.getText txttemperatura) (.getText txtruido) (.getText txthumedad))))
                ;; graficar datos  
               (def data (inio/read-dataset "data/paraGraficar.csv" :header true))
               (view (scatter-plot :temperatura :ruido :group-by :clase :x-label "Temperatura"
