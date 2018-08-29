@@ -1,7 +1,7 @@
 from random import randint
 
 # Numero de vectores, de este el 80% seran de entrenamiento, el resto sera de prueba
-NUMVECTORES = 9375
+NUMVECTORES = 10000
 
 # rangos para los parametros
 MINTEMP = 21

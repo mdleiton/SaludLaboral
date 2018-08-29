@@ -26,7 +26,7 @@
     (reset! server (run-server #'app {:address "192.168.0.100" :port 8080}  ) )
     
     ;; generación del modelo de predicción
-    (def datasetTrain (svm/read-dataset "data/prueba2"))
+    (def datasetTrain (svm/read-dataset "data/entrenamiento"))
     (def model (svm/train-model datasetTrain))
     (def datasetDePrueba (svm/read-dataset "data/prueba"))
 
