@@ -64,18 +64,18 @@
           (actionPerformed [e] 
             ;; validar input 
             (try
-                ;; actualizar datos del servidor
-               (def idmjs (+ idmjs 1))
-              (def es (str (str idmjs) "-" (sugerencias/getmensaje model (.getText txttemperatura) (.getText txtruido) (.getText txthumedad))))
-               ;; graficar datos  
+              ;; actualizar datos del servidor
+              (def idmjs (+ idmjs 1))
+              (def es (str (str idmjs) "-" (sugerencias/getmensaje model (.getText txttemperatura) (.getText txthumedad) (.getText txtruido) )))
+              ;; graficar datos  
               (def data (inio/read-dataset "data/paraGraficar.csv" :header true))
               (view (scatter-plot :temperatura :ruido :group-by :clase :x-label "Temperatura"
                              :y-label "Ruido" :title "Datos " :legend true :data data) )          
               ;; actualizar estado en la ventana principal (a lado del boton de verificacion)
-              (doto labelestadoactual (.setText (sugerencias/getestado model (.getText txttemperatura) (.getText txtruido) (.getText txthumedad))))
+              (doto labelestadoactual (.setText (sugerencias/getestado model (.getText txttemperatura) (.getText txthumedad) (.getText txtruido))))
               
               ;; presentacion de la predicción
-              (JOptionPane/showMessageDialog nil  (sugerencias/getmensaje model (.getText txttemperatura) (.getText txtruido) (.getText txthumedad)))
+              (JOptionPane/showMessageDialog nil  (sugerencias/getmensaje model (.getText txttemperatura) (.getText txthumedad) (.getText txtruido)))
               ;; limpiezando valores de los inputs
               (doto txttemperatura (.setText ""))
               (doto txtruido (.setText ""))

@@ -2,7 +2,7 @@
 	"+1":{
 		  "1" : "El ambiente es óptimo, den su mejor esfuerzo!",
 		  "2" : "Arriba ese ánimo!! tenemos un excelente ambiente!",
-		  "3" : "Con esta ambiente todo será mucho mejor!!",
+		  "3" : "Con este ambiente todo será mucho mejor!!",
  		  "4" : "Todo está en orden para trabajar correctamente. ánimos!!!"
  		  },
  	"-1":{
@@ -13,7 +13,7 @@
  		  },
  	"-2":{
 		  "1" : "De la Dirección de Recursos Humanos se informa que actualmente los niveles de humedad no son los adecuados para laboral.",
-		  "2" : "Los niveles de humedad no nocivos para trabajar por tal motivo se suspenden las actividades este día",
+		  "2" : "Los niveles de humedad son nocivos para trabajar por tal motivo se suspenden las actividades este día",
 		  "3" : "La humedad en la ciudad no es apto. Se están tomando medidas para controlar esto en las oficinas. Por favor diríjase al patio hasta segunda orden",
  		  "4" : "Los empleados que sufren alergias o problemas respiratorios debido a la humedad, por favor retirarse de la oficina"
  		  },
@@ -26,7 +26,7 @@
  	"-4":{
 		  "1" : "Debido a las malas condiciones, hemos decidido suspender las actividades el dia de hoy.",
 		  "2" : "La gerencia se disculpa por las malas condiciones, el dia de hoy se trabaja medio tiempo.",
-		  "3" :"El personal de mantenimiento se ha comunicado ya, en 30 minutos, volveremos a tener condiciones óptimas, hasta eso, se los invita a un refrigerio en el comedor.",
+		  "3" : "El personal de mantenimiento se ha comunicado ya, en 30 minutos, volveremos a tener condiciones óptimas, hasta eso, se los invita a un refrigerio en el comedor.",
  		  "4" : "15 minutos de tiempo libre hasta que se mejorar las condicionales ambientales de trabajo."
  		  }
 }
