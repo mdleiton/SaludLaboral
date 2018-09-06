@@ -9,7 +9,8 @@ Asignación estratégica de tiempo de descanso e interacción social basado en p
 * El proyecto tiene como objetivo desarrollar una aplicación que determine la condición ambiental laboral actual (adecuada, no-adecuada-th, no-adecuada-ruido) determinada por los siguientes parámetros: Temperatura, Humedad, Nivel de Ruido. Los datos serán obtenidos de una base de datos provista para este objetivo.
 
 ### Estado actual ###
-    Aplicación deskop
+
+    Aplicación desktop
 
 La aplicación con 10000 registros de temperatura, humedad, ruido entrena y genera un modelo para predecir 5 estados/categorías de condición ambiental laboral.
 
@@ -45,7 +46,15 @@ La aplicación para android presenta una interfaz muy sencilla. Esta aplicación
 Una vez que se recibe una respuesta con un id nuevo se lanza una notificación y se agrega a una lista de estados. cada elemento de la lista contiene la categoria, 3 sugerencias y la fecha.
 En esta version la url a la que realiza consultas es http://192.168.0.100:8080/. Se espera mejorar esto para que sea configurable desde la app. 
 
-Revisar capturas
+
+### Demo ###
+
+#### Videos ####
+* https://drive.google.com/open?id=1HBqlmEa1-VROPYu-dW8q1aSwjMARzlUE
+
+#### Capturas ####
+* https://bitbucket.org/mdleiton/ldp_2018_grupo3_lama_leiton/src/master/capturas/
+
 
 ### Dependencias ###
 
@@ -63,9 +72,6 @@ dependencias clojure
 dependecias App movil:
 
 * https://github.com/erf/http-request 
-
-
-Revisar capturas
 
 ### Autores ###
 
