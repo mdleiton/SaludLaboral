@@ -91,7 +91,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 
     public void solicitud(){
         new HttpRequestTask(
-                new HttpRequest("http://192.168.0.100:8080/", HttpRequest.GET ),
+                new HttpRequest("http://192.168.0.104:8080/", HttpRequest.GET ),
                 new HttpRequest.Handler() {
                     @Override
                     public void response(HttpResponse response) {
@@ -101,15 +101,11 @@ public class MainActivity extends Activity implements OnItemClickListener {
                             if (! listID.contains(Integer.parseInt(parts[0]))){
                                 listID.add(Integer.parseInt(parts[0]));
                                 if (! parts[1].contains("Sin estado")){
-                                    String[] mensaje = parts[1].split("Sugerencias:");
+                                    String[] mensaje = parts[1].split("Sugerencia:");
                                     SimpleDateFormat dateformat = new SimpleDateFormat("HH:mm:ss MM/dd/yyyy",Locale.US);
                                     String dateString = dateformat.format(new Date());
-                                    String[] sug1 = mensaje[1].split("1.");
-                                    String[] sug2 = mensaje[1].split("2.");
-                                    sug2 = sug2[1].split("3.");
-                                    String[] sug3 = mensaje[1].split("3.");
 
-                                    Aviso item = new Aviso(R.mipmap.ic_launcher_round,mensaje[0] ,"Sugerencias:\n 1. " + sug1[1] + "\n2. " + sug2[0] + "\n3. " + sug3[1] + "\n",dateString);
+                                    Aviso item = new Aviso(R.mipmap.ic_launcher_round,mensaje[0] ,"Sugerencia:\n 1. " + mensaje[1] + "\n",dateString);
                                     rowItems.add(item);
                                     adapter.notifyDataSetChanged();
 
@@ -119,7 +115,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
                                         .setAutoCancel(true)    //swipe for delete
                                         .setContentText(mensaje[0]) //content
                                         .setStyle(new Notification.BigTextStyle()
-                                                .bigText("Sugerencias:\n1. "+ sug1[1] + "\n2. " + sug2[0] + "\n3. " + sug3[1] + "\n"))
+                                                .bigText("Sugerencia:\n1. "+ mensaje[1] + "\n"))
                                         .build();
                                 NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                                 notificationManager.notify(1, builder);

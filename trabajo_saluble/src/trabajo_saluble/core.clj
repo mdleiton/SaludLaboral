@@ -23,7 +23,7 @@
 
 (defn -main [& args]
     ;; iniciando servidor que recibe las consultas de la app movil.
-    ;(reset! server (run-server #'app {:address "192.168.0.100" :port 8080}  ) )
+    ;(reset! server (run-server #'app {:address "192.168.0.104" :port 8080}  ) )
     (reset! server (run-server #'app {:address "127.0.0.1" :port 8080}  ) )    
     
     ;; generación del modelo de predicción

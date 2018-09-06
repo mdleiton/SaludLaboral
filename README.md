@@ -46,13 +46,15 @@ La aplicación para android presenta una interfaz muy sencilla. Esta aplicación
 Una vez que se recibe una respuesta con un id nuevo se lanza una notificación y se agrega a una lista de estados. cada elemento de la lista contiene la categoria, 3 sugerencias y la fecha.
 En esta version la url a la que realiza consultas es http://192.168.0.100:8080/. Se espera mejorar esto para que sea configurable desde la app. 
 
+### Documento ###
+
+[ Documento ](https://docs.google.com/document/d/1-Z67JVV_VoBLzTgYY6_jWaai1jgvk0GFR4o7IcHetFo/edit?usp=sharing)
 
 ### Demo ###
 
 [ Videos de la funcionalidad ](https://drive.google.com/open?id=1HBqlmEa1-VROPYu-dW8q1aSwjMARzlUE)
 
 [ Capturas de las aplicaciones ](https://bitbucket.org/mdleiton/ldp_2018_grupo3_lama_leiton/src/master/capturas/)
-
 
 ### Dependencias ###
 
